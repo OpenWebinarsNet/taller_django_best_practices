@@ -1,10 +1,16 @@
 from django.db import models
 
+from accounts.models.exceptions import NotEnoughMoneyError
 from customers.models import Customer
 
 
 class Account(models.Model):
     amount = models.FloatField()
+
+    def withdraw(self, amount: float):
+        if amount > self.amount:
+            raise NotEnoughMoneyError()
+        self.amount -= amount
 
 
 class AccountCustomer(models.Model):
@@ -15,11 +21,3 @@ class AccountCustomer(models.Model):
         unique_together = ('account', 'owner')
 
 
-class TransactionTypes(models.TextChoices):
-    WITHDRAW = 'WITHDRAW'
-
-
-class Transaction(models.Model):
-    type = models.CharField(max_length=10, choices=TransactionTypes.choices)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    amount = models.FloatField(default=0.0)

@@ -1,0 +1,2 @@
+class NotEnoughMoneyError(Exception):
+    pass
